@@ -1,40 +1,54 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
+#include <SDL2/SDL.h>
+#include <deque>
+#include <iostream>
 #include <vector>
-#include "SDL.h"
+
+using std::vector;
 
 class Snake {
- public:
-  enum class Direction { kUp, kDown, kLeft, kRight };
+public:
+  enum Direction { unknown, kUp, kDown, kLeft, kRight };
+  Direction direction = kUp;
+  std::deque<SDL_Point> body;
 
-  Snake(int grid_width, int grid_height)
-      : grid_width(grid_width),
-        grid_height(grid_height),
-        head_x(grid_width / 2),
-        head_y(grid_height / 2) {}
+  Snake(const int &grid_width, const int &grid_height, int &&num)
+      : grid_width(grid_width), grid_height(grid_height),
+        head_y(grid_height * 0.75f) {
+    if (num == 0)
+      head_x = grid_width * 0.25;
+    else
+      head_x = grid_width * 0.75;
 
-  void Update();
-
-  void GrowBody();
-  bool SnakeCell(int x, int y);
-
-  Direction direction = Direction::kUp;
-
-  float speed{0.1f};
+    speed = 0.15f;
+  }
+  float speed{0.0f};
   int size{1};
   bool alive{true};
   float head_x;
   float head_y;
-  std::vector<SDL_Point> body;
+  bool moved{false};
 
- private:
+  virtual void Update(const Snake &other);
+
+  static vector<vector<bool>> grid;
+
+  void GrowBody();
+  bool SnakeCell(const int &x, const int &y);
+  bool GetFood(SDL_Point food);
+  int get_score() const { return score; }
+
+protected:
   void UpdateHead();
-  void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell);
+  void UpdateBody(const SDL_Point *current_head_cell, SDL_Point &prev_head_cell,
+                  const Snake &other);
 
   bool growing{false};
   int grid_width;
   int grid_height;
+  int score{0};
 };
 
 #endif
