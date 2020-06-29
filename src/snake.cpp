@@ -6,7 +6,7 @@
 
 using std::vector;
 
-vector<vector<bool>> Snake::grid(height, std::vector<bool>(width, false));
+vector<vector<bool>> Snake::grid(height, vector<bool>(width, false));
 extern std::mutex mutlock;
 
 bool Snake::GetFood(SDL_Point food) {
@@ -91,7 +91,7 @@ void Snake::UpdateBody(const SDL_Point *current_head_cell,
   if (!growing) {
     // Remove the tail from the vector.
     lock_obj.lock();
-    Snake::grid[body[0].x][body[0].y]] = 0;
+    Snake::grid[body[0].x][body[0].y] = 0;
     lock_obj.unlock();
     body.pop_front();
   } else {
