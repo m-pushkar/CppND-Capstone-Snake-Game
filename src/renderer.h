@@ -11,8 +11,8 @@ public:
            const std::size_t &grid_width, const std::size_t &grid_height);
   ~Renderer();
 
-  void Render(Snake const &snake, SDL_Point const &food,
-              Snake const &computer_snake);
+  void Render(Snake const &snake, Snake const &computer_snake,
+              SDL_Point const &food);
   void UpdateWindowTitle(int &&score_1, int &&score_2, int &fps);
 
 private:
