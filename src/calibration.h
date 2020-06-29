@@ -1,7 +1,7 @@
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 
-#define width 32U
-#define height 32U
+const int width = 32U;
+const int height = 32U;
 
 #endif
