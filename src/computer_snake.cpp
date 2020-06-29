@@ -17,7 +17,7 @@ void Computer_snake::Update(const Snake &other) {
   SDL_Point current_cell{static_cast<int>(head_x), static_cast<int>(head_y)};
 
   // Update body vector if head has moved to new position
-  bool self_moved = fasle;
+  bool self_moved = false;
 
   if (current_cell.x != prev_cell.x || current_cell.y != prev_cell.y) {
     self_moved = true;
@@ -54,9 +54,9 @@ void Computer_snake::Update(const Snake &other) {
   }
 }
 
-bool computer_snake::path_search(vector<vector<Direction>> &dir_ar,
+bool Computer_snake::path_search(vector<vector<Direction>> &dir_ar,
                                  const SDL_Point &food, const SDL_Point &head,
-                                 int &&grid_width, int &&grid_height) {
+                                 const int grid_width, const int grid_height) {
 
   // Parameter initilaization
   bool find_path = false;
