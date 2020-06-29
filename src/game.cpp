@@ -1,17 +1,19 @@
 #include "game.h"
+#include <SDL2/SDL.h>
 #include <iostream>
-#include "SDL.h"
 
-Game::Game(std::size_t grid_width, std::size_t grid_height)
-    : snake(grid_width, grid_height),
-      engine(dev()),
-      random_w(0, static_cast<int>(grid_width)),
-      random_h(0, static_cast<int>(grid_height)) {
+std::mutex mutlock;
+Game::Game(const std::size_t &grid_width, const std::size_t &grid_height)
+    : snake(grid_width, grid_height, 1U),
+      computer_snake(grid_width, grid_height, 0U), engine(dev()),
+      // Place food withing -5 of frame
+      random_w(0, static_cast<int>(grid_width) - 2.5),
+      random_h(0, static_cast<int>(grid_height) - 2.5) {
   PlaceFood();
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,
-               std::size_t target_frame_duration) {
+               const std::size_t &target_frame_duration) {
   Uint32 title_timestamp = SDL_GetTicks();
   Uint32 frame_start;
   Uint32 frame_end;
@@ -20,13 +22,13 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   bool running = true;
 
   while (running) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
     controller.HandleInput(running, snake);
     Update();
-    renderer.Render(snake, food);
-
+    renderer.Render(snake, computer_snake, food);
     frame_end = SDL_GetTicks();
 
     // Keep track of how long each loop through the input/update/render cycle
@@ -36,7 +38,8 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      renderer.UpdateWindowTitle(score, frame_count);
+      renderer.UpdateWindowTitle(snake.get_score(), computer_snake.get_score(),
+                                 frame_count);
       frame_count = 0;
       title_timestamp = frame_end;
     }
@@ -57,7 +60,7 @@ void Game::PlaceFood() {
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    if (!snake.SnakeCell(x, y)) {
+    if (!snake.SnakeCell(x, y) && !computer_snake.SnakeCell(x, y)) {
       food.x = x;
       food.y = y;
       return;
@@ -66,22 +69,26 @@ void Game::PlaceFood() {
 }
 
 void Game::Update() {
-  if (!snake.alive) return;
+  if (snake.alive == false || computer_snake.alive == false) {
+    return;
+  }
 
-  snake.Update();
+  // Initialize player on another thread
+  std::future<void> update_snake =
+      std::async(&Snake::Update, &snake, computer_snake);
+  update_snake.wait();
 
-  int new_x = static_cast<int>(snake.head_x);
-  int new_y = static_cast<int>(snake.head_y);
+  computer_snake.record_food(food);
+  computer_snake.Update(snake);
 
   // Check if there's food over here
-  if (food.x == new_x && food.y == new_y) {
-    score++;
+  if (computer_snake.GetFood(food) == true) {
+    computer_snake.require_new_path();
     PlaceFood();
-    // Grow snake and increase speed.
-    snake.GrowBody();
-    snake.speed += 0.02;
+  } else if (snake.GetFood(food) == true) {
+    PlaceFood();
   }
 }
 
-int Game::GetScore() const { return score; }
+int Game::GetScore() const { return snake.get_score(); }
 int Game::GetSize() const { return snake.size; }
