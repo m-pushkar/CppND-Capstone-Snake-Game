@@ -83,7 +83,7 @@ void Game::Update() {
 
   // Check if there's food over here
   if (computer_snake.GetFood(food) == true) {
-    computer_snake.require_new_path();
+    computer_snake.new_path();
     PlaceFood();
   } else if (snake.GetFood(food) == true) {
     PlaceFood();
