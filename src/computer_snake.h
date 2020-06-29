@@ -18,23 +18,21 @@ public:
       : Snake(grid_width, grid_height, std::move(num)) {
     speed = 0.1f;
   }
-  void new_path() { update_path = true; } // require_new_path = new_path
+  void new_path() { update_path = true; }
   void Update(const Snake &other) override;
   void record_food(const SDL_Point &position);
 
 private:
   bool update_path{false};
   SDL_Point _food{0, 0};
-  Direction _last_dir{unknown}; // _last_direction_state = _last_dir
-  struct Change                 // Delta = Change
-  {
+  Direction _last_dir{unknown};
+  struct Change {
     int x;
     int y;
     Direction action;
   };
 
-  struct Find // Search_pt = Find
-  {
+  struct Find {
   public:
     Find() : x(-1), y(-1){};
     Find(int current_x, int current_y) : x(current_x), y(current_y){};
@@ -53,15 +51,12 @@ private:
     }
   };
 
-  bool path_search(vector<vector<Direction>> &direction_arr,
-                   const SDL_Point &food, const SDL_Point &head,
-                   int &&grid_width, int &&grid_height);
+  bool path_search(vector<vector<Direction>> &dir_ar, const SDL_Point &food,
+                   const SDL_Point &head, const int grid_width,
+                   const int grid_height);
 
-  vector<Change> change_list = {// delta_list = change_list
-                                {0, -1, kUp},
-                                {0, 1, kDown},
-                                {-1, 0, kLeft},
-                                {1, 0, kRight}};
+  vector<Change> change_list = {
+      {0, -1, kUp}, {0, 1, kDown}, {-1, 0, kLeft}, {1, 0, kRight}};
 };
 
 #endif
