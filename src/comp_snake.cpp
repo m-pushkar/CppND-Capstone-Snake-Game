@@ -45,7 +45,7 @@ void Comp_snake::Update(const Snake &other)
 
     if (path_set != true)
     {
-      bool suicide = true;
+      bool crash = true;
       for (auto &move : change_list)
       {
         int next_x = head_x + move.x;
@@ -53,13 +53,12 @@ void Comp_snake::Update(const Snake &other)
         if (next_x >= 0 && next_x < grid_height && next_y >= 0 && next_y < grid_width && Snake::grid[next_x][next_y] != true)
         {
           direction = move.action;
-          suicide = false;
+          crash = false;
           break;
         }
       }
-      if (suicide = true)
+      if (crash = true)
       {
-        std::cout << "suicide mission" << std::endl;
         direction = _last_dir;
       }
     }
