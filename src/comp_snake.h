@@ -39,14 +39,14 @@ private:
   public:
     Find() : x(-1), y(-1){};
     Find(int current_x, int current_y) : x(current_x), y(current_y){};
-    /*member*/
     int x;
     int y;
     int cost{0};
     bool visited{false};
     Direction action{unknown};
     SDL_Point parent{-1, -1};
-    /* member function */
+    
+    // Functions
     bool operator<(Find const &a) const
     {
       return (cost > a.cost) ? true : false;
