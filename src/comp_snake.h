@@ -16,7 +16,6 @@ class Comp_snake : public Snake
 public:
   Comp_snake(const int &grid_width, const int &grid_height, int &&num) : Snake(grid_width, grid_height, std::move(num))
   {
-    std::cout << "autonomous snake built" << std::endl;
     speed = 0.1f;
   }
   void Update(const Snake &other) override;
