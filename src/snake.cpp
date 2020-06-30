@@ -18,7 +18,7 @@ void Snake::Update(const Snake &other)
       static_cast<int>(head_x),
       static_cast<int>(head_y)}; // Capture the head's cell after updating.
 
-  // Update all of the body vector items if the snake head has moved to a new cell
+  // Update body vector if the snake head has moved to a new cell
   moved = false;
   if (current_cell.x != prev_cell.x || current_cell.y != prev_cell.y)
   {
@@ -32,15 +32,13 @@ void Snake::UpdateBody(const SDL_Point *current_head_cell, SDL_Point &prev_head_
   // Add previous head location to vector
   body.push_back(prev_head_cell);
 
-  //unique_lock prevents data
-
+  // Mutex prevents data
   std::unique_lock<std::mutex> lock_obj(mutlock);
   Snake::grid[prev_head_cell.x][prev_head_cell.y] = 1;
   lock_obj.unlock();
 
   if (!growing)
   {
-    // Remove the tail from the vector.
     lock_obj.lock();
     Snake::grid[body[0].x][body[0].y] = 0;
     lock_obj.unlock();
@@ -51,8 +49,8 @@ void Snake::UpdateBody(const SDL_Point *current_head_cell, SDL_Point &prev_head_
     growing = false;
     size++;
   }
-  // Check snake's status.
 
+  // Status
   if (current_head_cell->x != prev_head_cell.x || current_head_cell->y != prev_head_cell.y)
   {
     for (auto const &item : body)
@@ -104,8 +102,6 @@ void Snake::UpdateHead()
 }
 
 void Snake::GrowBody() { growing = true; }
-
-// Inefficient method to check if cell is occupied by snake.
 bool Snake::SnakeCell(const int &x, const int &y)
 {
   if (x == static_cast<int>(head_x) && y == static_cast<int>(head_y))
