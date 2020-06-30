@@ -63,8 +63,8 @@ void Game::Update()
   {
     return;
   }
+    
   // Player set onto another thread
-
   std::future<void> update_snake = std::async(&Snake::Update, &snake, comp_snake);
   update_snake.wait();
 
@@ -72,8 +72,7 @@ void Game::Update()
   comp_snake.record_food(food);
   comp_snake.Update(snake);
 
-  // Check if there's food over here
-  //comp_snake.update_path = comp_snake.GetFood(food);
+  // Check for availability of food
   if (comp_snake.GetFood(food) == true)
   {
     comp_snake.new_path();
