@@ -1,7 +1,7 @@
-##include "computer_snake.h"
+#include "computer_snake.h"
 #include "calibration.h"
 
-    extern std::mutex mutlock;
+extern std::mutex mutlock;
 
 void Computer_snake::record_food(const SDL_Point &position) {
   _food.x = position.x;
