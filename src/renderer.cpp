@@ -1,4 +1,5 @@
 #include "renderer.h"
+
 #include <iostream>
 #include <string>
 
@@ -68,15 +69,6 @@ void Renderer::Render(Snake const &snake, Snake const &comp_snake, SDL_Point con
     SDL_RenderFillRect(sdl_renderer, &block);
   }
 
-  // Render snake_2's body
-  SDL_SetRenderDrawColor(sdl_renderer, 0x8F, 0xAA, 0xDC, 0xFF);
-  for (SDL_Point const &point : comp_snake.body)
-  {
-    block.x = point.x * block.w;
-    block.y = point.y * block.h;
-    SDL_RenderFillRect(sdl_renderer, &block);
-  }
-
   // Render snake 1's head
   block.x = static_cast<int>(snake.head_x) * block.w;
   block.y = static_cast<int>(snake.head_y) * block.h;
@@ -89,6 +81,15 @@ void Renderer::Render(Snake const &snake, Snake const &comp_snake, SDL_Point con
     SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
   }
   SDL_RenderFillRect(sdl_renderer, &block);
+
+  // Render snake_2's body
+  SDL_SetRenderDrawColor(sdl_renderer, 0x8F, 0xAA, 0xDC, 0xFF);
+  for (SDL_Point const &point : comp_snake.body)
+  {
+    block.x = point.x * block.w;
+    block.y = point.y * block.h;
+    SDL_RenderFillRect(sdl_renderer, &block);
+  }
 
   // Render snake 2's head
   block.x = static_cast<int>(comp_snake.head_x) * block.w;

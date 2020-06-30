@@ -19,11 +19,7 @@ void Comp_snake::Update(const Snake &other)
       static_cast<int>(head_x),
       static_cast<int>(head_y)}; // Capture the head's cell after updating.
 
-  /*Update the body vector items if the snake head has moved to a new cell
-  * condition update_path == true : when comp_snake get food, immediately need to build new path
-  * condition other.moved == true : two snakes have different speed, need to re-build path in case auto doesn't move but player does
-  * without this condition, in some cases, auto will bump into player, but this will cause lagged.
-  */
+  // Update the body vector
   bool self_moved = false;
   if (current_cell.x != prev_cell.x || current_cell.y != prev_cell.y)
   {
@@ -33,7 +29,6 @@ void Comp_snake::Update(const Snake &other)
   if (self_moved == true || update_path == true || other.moved == true)
   {
     update_path = false;
-    /*snake and comp_snake body has record in Snake::grid by function UpdateBody */
     std::vector<std::vector<Direction>> direction_arr(height, std::vector<Direction>(width, unknown));
     bool path_set = false;
     path_set = path_search(direction_arr, _food, current_cell, width, height);
@@ -43,10 +38,7 @@ void Comp_snake::Update(const Snake &other)
     {
       _last_dir = direction;
     }
-    /*
-     * in case food is surround by opponent, path can not be built
-     * find next possible direction
-     */
+
     if (path_set != true)
     {
       bool suicide = true;
@@ -72,21 +64,19 @@ void Comp_snake::Update(const Snake &other)
 
 bool Comp_snake::path_search(std::vector<std::vector<Direction>> &direction_arr, const SDL_Point &food, const SDL_Point &head, int &&grid_width, int &&grid_height)
 {
-  /* initialize parameters */
+  // Parameter initilaization
   bool find_path = false;
   std::unique_lock<std::mutex> lock_obj(mutlock);
   std::vector<std::vector<Find>> close_mtx(grid_height, std::vector<Find>(grid_width));
   std::vector<Find> open_list;
-
-  /* set first point*/
   Find start(head.x, head.y);
   open_list.emplace_back(start);
-  /* initialize close_mtx*/
+
   close_mtx[head.x][head.y].visited = true;
   close_mtx[head.x][head.y].x = head.x;
   close_mtx[head.x][head.y].y = head.y;
 
-  /* start searching*/
+  // Search
   while (!open_list.empty())
   {
     sort(open_list.begin(), open_list.end());
@@ -105,7 +95,7 @@ bool Comp_snake::path_search(std::vector<std::vector<Direction>> &direction_arr,
       {
         int next_x = expand.x + move.x;
         int next_y = expand.y + move.y;
-        /* check if next possible point is inside windown and not occupied by player snake body and by itself, also not been calculated */
+
         if (next_x >= 0 && next_x < grid_height && next_y >= 0 && next_y < grid_width && Snake::grid[next_x][next_y] != true && close_mtx[next_x][next_y].visited != true)
         {
           close_mtx[next_x][next_y].cost = expand.cost + 1U;
@@ -121,7 +111,7 @@ bool Comp_snake::path_search(std::vector<std::vector<Direction>> &direction_arr,
       }
     }
   }
-  /* build direction_arr if find_path is true */
+
   if (find_path == true)
   {
     Find *current = &close_mtx[food.x][food.y];

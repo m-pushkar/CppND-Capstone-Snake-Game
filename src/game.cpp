@@ -1,4 +1,5 @@
 #include "game.h"
+
 #include <iostream>
 #include <SDL2/SDL.h>
 
@@ -8,7 +9,6 @@ Game::Game(const std::size_t &grid_width, const std::size_t &grid_height)
     : comp_snake(grid_width, grid_height, 0U),
       snake(grid_width, grid_height, 1U),
       engine(dev()),
-      /* -1 to limit food place within window */
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1))
 {
@@ -50,9 +50,6 @@ void Game::Run(Controller const &controller, Renderer &renderer, const std::size
       title_timestamp = frame_end;
     }
 
-    // If the time for this frame is too small (i.e. frame_duration is
-    // smaller than the target ms_per_frame), delay the loop to
-    // achieve the correct frame rate.
     if (frame_duration < target_frame_duration)
     {
       SDL_Delay(target_frame_duration - frame_duration);
@@ -66,10 +63,12 @@ void Game::Update()
   {
     return;
   }
-  /* set player onto another thread */
+  // Player set onto another thread
+
   std::future<void> update_snake = std::async(&Snake::Update, &snake, comp_snake);
   update_snake.wait();
-  /* Comp_snake */
+
+  //Computer snake
   comp_snake.record_food(food);
   comp_snake.Update(snake);
 
@@ -93,7 +92,8 @@ void Game::PlaceFood()
   {
     x = random_w(engine);
     y = random_h(engine);
-    // Check that the location is not occupied by a snake item before placing food.
+    
+    // Check that the location is not occupied
     if (!comp_snake.SnakeCell(x, y) && !snake.SnakeCell(x, y))
     {
       food.x = x;

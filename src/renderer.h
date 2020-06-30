@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "snake.h"
+
 #include <vector>
 #include <SDL2/SDL.h>
 

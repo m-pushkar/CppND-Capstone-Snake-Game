@@ -1,6 +1,7 @@
 #include "snake.h"
 #include "game.h"
 #include "calibration.h"
+
 #include <cmath>
 #include <iostream>
 
@@ -30,11 +31,11 @@ void Snake::UpdateBody(const SDL_Point *current_head_cell, SDL_Point &prev_head_
 {
   // Add previous head location to vector
   body.push_back(prev_head_cell);
-  /*
-     a unique_lock set here to prevent data race to static member Snake::grid
-  */
+
+  //unique_lock prevents data
+
   std::unique_lock<std::mutex> lock_obj(mutlock);
-  Snake::grid[prev_head_cell.x][prev_head_cell.y] = 1; /*add snake body into grid */
+  Snake::grid[prev_head_cell.x][prev_head_cell.y] = 1;
   lock_obj.unlock();
 
   if (!growing)
@@ -50,10 +51,8 @@ void Snake::UpdateBody(const SDL_Point *current_head_cell, SDL_Point &prev_head_
     growing = false;
     size++;
   }
-  // Check if the snake has died.
-  /* add this condition to make sure while auto_snake reaching food and building new path, shall not enter here
-   * because update_path is true in auto_snake.cpp: Auto_snake::Update(const Snake &other)
-   */
+  // Check snake's status.
+
   if (current_head_cell->x != prev_head_cell.x || current_head_cell->y != prev_head_cell.y)
   {
     for (auto const &item : body)
@@ -93,16 +92,14 @@ void Snake::UpdateHead()
   case Direction::unknown:
     break;
   }
-  /* limit snake active range, once snake head is beyond range, set alive to false
-     when x or y greater than 32.0, set it to 31.. for rendering */
 
   if (head_x < 0.0f || head_y < 0.0f || head_x >= 32.0f || head_y >= 32.0f)
   {
     alive = false;
     if (head_x >= 32.0f)
-      head_x = 31.99;
+      head_x = 31.50;
     else if (head_y >= 32.0f)
-      head_y = 31.99;
+      head_y = 31.50;
   }
 }
 
@@ -134,9 +131,8 @@ bool Snake::GetFood(SDL_Point food)
   if (food.x == new_x && food.y == new_y)
   {
     get_food = true;
-    // Grow snake and increase speed.
-    score++;
-    GrowBody();
+    score++;          // Increse score
+    GrowBody();       // Increse body
   }
 
   return get_food;

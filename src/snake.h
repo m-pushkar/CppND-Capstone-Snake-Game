@@ -2,6 +2,7 @@
 #define SNAKE_H
 
 #include <SDL2/SDL.h>
+
 #include <vector>
 #include <deque>
 #include <iostream>
